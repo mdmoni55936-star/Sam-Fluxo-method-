@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok Quality Optimizer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#101114;color:#fff}
+.wrap{max-width:520px;margin:auto;padding:28px 18px}.card{background:#191b20;border-radius:20px;padding:22px;box-shadow:0 10px 35px #0006}
+h1{margin:0 0 8px;font-size:26px}.sub{color:#aeb3bd;margin-bottom:22px}
+input{display:none}.pick{display:block;text-align:center;padding:18px;border:1px dashed #777;border-radius:14px;cursor:pointer}
+button,.download{width:100%;border:0;border-radius:13px;padding:15px;margin-top:15px;font-size:16px;font-weight:700;cursor:pointer}
+button{background:#fff;color:#111}.download{display:block;text-align:center;background:#ff245f;color:white;text-decoration:none}
+#status{margin-top:18px;color:#cbd0d8;text-align:center;line-height:1.5}
+small{display:block;color:#888;margin-top:18px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<h1>Video Quality Optimizer</h1>
+<div class="sub">Optimize your video for social-media upload.</div>
+<label class="pick" for="video">📤 Select Video</label>
+<input id="video" type="file" accept="video/*">
+<div id="name"></div>
+<button id="go">Optimize Video</button>
+<div id="status"></div>
+<div id="result"></div>
+<small>Processing happens on your server. This starter uses FFmpeg and does not use unofficial TikTok login automation.</small>
+</div></div>
+<script>
+const input=document.getElementById("video"), name=document.getElementById("name");
+input.onchange=()=>{name.textContent=input.files[0]?.name||""};
+document.getElementById("go").onclick=async()=>{
+ if(!input.files[0]) return alert("Select a video first.");
+ const fd=new FormData(); fd.append("video",input.files[0]);
+ document.getElementById("status").textContent="Optimizing… please wait.";
+ document.getElementById("result").innerHTML="";
+ try{
+  const r=await fetch("/api/optimize",{method:"POST",body:fd});
+  const data=await r.json();
+  if(!r.ok) throw new Error(data.error||"Processing failed");
+  document.getElementById("status").textContent="Done!";
+  document.getElementById("result").innerHTML=`<a class="download" href="${data.download}">⬇ Download Optimized Video</a>`;
+ }catch(e){document.getElementById("status").textContent=e.message}
+};
+</script>
+</body>
+</html>
